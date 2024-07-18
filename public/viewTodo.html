@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h5 id="id"></h5>
+    <h2 id="titile"></h2>
+    <p id="description"></p>
+    <a href="/">Go Home</a>
+    <button onclick="updateTodo()"> Update ToDo</button>
+    <button onclick="deleteTodo()">Delete ToDo</button>
+    <script>
+ async function getData() {
+            const url = window.location.href;
+            const id = window.location.pathname.split('/').pop();
+            const response = await fetch(`/viewData/${id}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch todo details');
+            }
+            const res = await response.json();
+            document.getElementById('id').textContent = `ID: ${res.id}`;
+            document.getElementById('title').textContent = res.title;
+            document.getElementById('description').textContent = res.description;
+ }
+
+ async function updateTodo() {
+            const id = window.location.pathname.split('/').pop();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            try {
+                const response = await fetch(`/todo/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, description }),
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to update todo');
+                }
+                alert('Todo updated successfully');
+                window.location.reload();
+            } catch (error) {
+                console.error('Error updating todo:', error);
+                alert('Failed to update todo');
+            }
+        }
+
+        async function deleteTodo() {
+            const id = window.location.pathname.split('/').pop();
+            try {
+                const response = await fetch(`/api/todo/${id}`, {
+                    method: 'DELETE',
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to delete todo');
+                }
+                alert('Todo deleted successfully');
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error deleting todo:', error);
+                alert('Failed to delete todo');
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', getData);
+    </script>
+</body>
+</html>
